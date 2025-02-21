@@ -2,6 +2,7 @@
 using ReviewMovie.API.Data;
 using ReviewMovie.API.Models.Movie;
 using ReviewMovie.API.Models.Review;
+using ReviewMovie.API.Models.User;
 
 namespace ReviewMovie.API.Configurations
 {
@@ -9,15 +10,15 @@ namespace ReviewMovie.API.Configurations
 	{
 		public MapperConfig()
 		{
-			CreateMap<Movie, BaseMovieDto>().ReverseMap();
 			CreateMap<Movie, CreateMovieDto>().ReverseMap();
 			CreateMap<Movie, GetMovieDto>().ReverseMap();
 			CreateMap<Movie, MovieDto>().ReverseMap();
 			CreateMap<Movie, UpdateMovieDto>().ReverseMap();
 
-			CreateMap<Review, BaseReviewDto>().ReverseMap();
-			CreateMap<Movie, CreateReviewDto>().ReverseMap();
-			CreateMap<Movie, ReviewDto>().ReverseMap();
+			CreateMap<Review, CreateReviewDto>().ReverseMap();
+			CreateMap<Review, ReviewDto>().ReverseMap();
+
+			CreateMap<ApiUserDto, ApiUser>().ReverseMap();
 
 		}
 	}

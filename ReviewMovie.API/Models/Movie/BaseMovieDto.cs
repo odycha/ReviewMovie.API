@@ -2,7 +2,7 @@
 
 namespace ReviewMovie.API.Models.Movie
 {
-	public class BaseMovieDto
+	public abstract class BaseMovieDto
 	{
 		[Required]
 		public string Title { get; set; }

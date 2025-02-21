@@ -1,9 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using ReviewMovie.API.Configurations;
 
 namespace ReviewMovie.API.Data
 {
-	public class MovieReviewDbContext : DbContext
+	public class MovieReviewDbContext : IdentityDbContext<ApiUser>
 	{
 
 		public MovieReviewDbContext(DbContextOptions options) : base(options)
@@ -18,6 +19,7 @@ namespace ReviewMovie.API.Data
 			base.OnModelCreating(modelBuilder);
 			modelBuilder.ApplyConfiguration(new MovieConfiguration());
 			modelBuilder.ApplyConfiguration(new ReviewConfiguration());
+			modelBuilder.ApplyConfiguration(new RoleConfiguration());
 		}
 	}
 

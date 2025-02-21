@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ReviewMovie.API.Models.Review
 {
-	public class BaseReviewDto
+	public abstract class BaseReviewDto
 	{
 		[Required]
 		public string ReviewerName { get; set; }

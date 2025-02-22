@@ -7,6 +7,7 @@ using ReviewMovie.API.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using ReviewMovie.API.Exceptions;
 using Asp.Versioning;
+using ReviewMovie.API.Model;
 
 namespace ReviewMovie.API.Controllers
 {
@@ -25,8 +26,8 @@ namespace ReviewMovie.API.Controllers
 			_moviesRepository = moviesRepository;
 		}
 
-		// GET: api/Movies
-		[HttpGet]
+		// GET: api/v1/Movies/GetAll
+		[HttpGet("GetAll")]
 		public async Task<ActionResult<IEnumerable<GetMovieDto>>> GetMovies()
 		{
 			var movies = await _moviesRepository.GetAllAsync();
@@ -34,6 +35,14 @@ namespace ReviewMovie.API.Controllers
 			var moviesDto = _mapper.Map<List<GetMovieDto>>(movies);
 
 			return Ok(moviesDto);
+		}
+
+		// GET: api/v1/Movies?StartIndex=0&pagesize=25&PageNumber=1
+		[HttpGet]
+		public async Task<ActionResult<PagedResult<GetMovieDto>>> GetPagedMovies([FromQuery] QueryParameters queryParameters)
+		{
+			var pagedMoviesResult = await _moviesRepository.GetAllAsync<GetMovieDto>(queryParameters);
+			return Ok(pagedMoviesResult);
 		}
 
 		// GET: api/Movies/5

@@ -1,18 +1,23 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
+﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using ReviewMovie.API.Contracts;
 using ReviewMovie.API.Data;
 using ReviewMovie.API.Exceptions;
+using ReviewMovie.API.Model;
 
 namespace ReviewMovie.API.Repository
 {
 	public class GenericRepository<T> : IGenericRepository<T> where T: class
 	{
 		private readonly MovieReviewDbContext _context;
+		private readonly IMapper _mapper;
 
-		public GenericRepository(MovieReviewDbContext context)
+		public GenericRepository(MovieReviewDbContext context, IMapper mapper)
         {
 			_context = context;
+			_mapper = mapper;
 		}
 		public async Task<T> GetAsync(int? id)
 		{
@@ -26,6 +31,24 @@ namespace ReviewMovie.API.Repository
 		public async Task<List<T>> GetAllAsync()
 		{
 			return await _context.Set<T>().ToListAsync();
+		}
+
+		public async Task<PagedResult<TResult>> GetAllAsync<TResult>(QueryParameters queryParameters)
+		{
+			var totalSize = await _context.Set<T>().CountAsync();
+			var items = await _context.Set<T>()
+				.Skip(queryParameters.StartIndex)
+				.Take(queryParameters.PageSize)
+				.ProjectTo<TResult>(_mapper.ConfigurationProvider)
+				.ToListAsync();
+
+			return new PagedResult<TResult>
+			{
+				Items = items,
+				PageNumber = queryParameters.PageNumber,
+				RecordNumber = queryParameters.PageSize,
+				TotalCount = totalSize
+			};
 		}
 		public async Task UpdateAsync(T entity)
 		{

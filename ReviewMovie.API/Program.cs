@@ -1,5 +1,6 @@
 
 using Asp.Versioning;
+using Azure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -68,7 +69,8 @@ namespace ReviewMovie.API
 					new MediaTypeApiVersionReader("ver")
 				);
 			});// Nuget Package: Asp.Versioning.Mvc
-			   //versioning configuration (2/2)
+
+			//versioning configuration (2/2)
 			apiVersioningBuilder.AddApiExplorer(options =>
 			{
 				// add the versioned api explorer, which also adds IApiVersionDescriptionProvider service
@@ -107,6 +109,15 @@ namespace ReviewMovie.API
 				};
 			});
 
+			//Caching configuration
+			builder.Services.AddResponseCaching(options =>
+			{
+				//in bytes what is the largest cachable data
+				options.MaximumBodySize = 1024;
+				//different cache for api/Hotels vs api/hotels
+				options.UseCaseSensitivePaths = true;
+			});
+
 			var app = builder.Build();
 
 			// Configure the HTTP request pipeline.
@@ -126,6 +137,22 @@ namespace ReviewMovie.API
 
 			//Cors configuration(2/2)
 			app.UseCors("AllowAll");
+
+			// Response caching configuration
+			app.UseResponseCaching();
+			app.Use(async (context, next) =>
+			{
+				context.Response.GetTypedHeaders().CacheControl =
+					new Microsoft.Net.Http.Headers.CacheControlHeaderValue()
+					{
+						Public = true,
+						MaxAge = TimeSpan.FromSeconds(10)
+					};
+				context.Response.Headers[Microsoft.Net.Http.Headers.HeaderNames.Vary] =
+					new string[] { "Accept-Encoding" };
+
+				await next();
+			});
 
 			app.UseAuthentication();
 			app.UseAuthorization();

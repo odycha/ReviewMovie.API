@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using ReviewMovie.API.Contracts;
 using ReviewMovie.API.Data;
 using ReviewMovie.API.Exceptions;
+using ReviewMovie.API.Model;
 using ReviewMovie.API.Models.Review;
 
 namespace ReviewMovie.API.Controllers
@@ -30,8 +31,8 @@ namespace ReviewMovie.API.Controllers
 			_reviewsRepository = reviewsRepository;
         }
 
-        // GET: api/Reviews
-        [HttpGet]
+        // GET: api/v1/Reviews/GetAll
+        [HttpGet("GetAll")]
         public async Task<ActionResult<IEnumerable<ReviewDto>>> GetReviews()
         {
             var reviews = await _reviewsRepository.GetAllAsync();
@@ -39,8 +40,16 @@ namespace ReviewMovie.API.Controllers
             return Ok(reviewsDto);
         }
 
-        // GET: api/Reviews/5
-        [HttpGet("{id}")]
+		//GET: api/v1/Reviews/?StartIndex=0&pagesize=25&PageNumber=1
+		[HttpGet]
+		public async Task<ActionResult<PagedResult<ReviewDto>>> GetReviews([FromQuery] QueryParameters queryParameters)
+        {
+            var pagedReviewResult = await _reviewsRepository.GetAllAsync<ReviewDto>(queryParameters);
+            return Ok(pagedReviewResult);
+        }
+
+		// GET: api/Reviews/5
+		[HttpGet("{id}")]
         public async Task<ActionResult<ReviewDto>> GetReview(int id)
         {
             var review = await _reviewsRepository.GetAsync(id);

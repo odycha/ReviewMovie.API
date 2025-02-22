@@ -1,16 +1,16 @@
 
 using Asp.Versioning;
-using Azure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.OData;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using ReviewMovie.API.Configurations;
-using ReviewMovie.API.Contracts;
+using ReviewMovie.API.Core.Configurations;
+using ReviewMovie.API.Core.Contracts;
+using ReviewMovie.API.Core.Middleware;
+using ReviewMovie.API.Core.Repository;
 using ReviewMovie.API.Data;
-using ReviewMovie.API.Middleware;
-using ReviewMovie.API.Repository;
+using ReviewMovies.API.Data;
 using Serilog;
 using System.Text;
 
@@ -129,7 +129,7 @@ namespace ReviewMovie.API
 			// Configure the HTTP request pipeline.
 			if (app.Environment.IsDevelopment())
 			{
-				
+
 			}
 
 			app.UseSwagger();

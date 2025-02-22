@@ -1,8 +1,7 @@
 ﻿using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
-using ReviewMovie.API.Contracts;
-using ReviewMovie.API.Models.User;
-using ReviewMovie.API.Repository;
+using ReviewMovie.API.Core.Contracts;
+using ReviewMovie.API.Core.Models.User;
 
 namespace ReviewMovie.API.Controllers
 {
@@ -27,13 +26,13 @@ namespace ReviewMovie.API.Controllers
 		[ProducesResponseType(StatusCodes.Status200OK)]
 		[ProducesResponseType(StatusCodes.Status400BadRequest)]
 		[ProducesResponseType(StatusCodes.Status500InternalServerError)]
-		public async Task<ActionResult> Register([FromBody]ApiUserDto apiUserDto)
+		public async Task<ActionResult> Register([FromBody] ApiUserDto apiUserDto)
 		{
 			var errors = await _authManager.Register(apiUserDto);
 
 			if (errors.Any())
 			{
-				foreach(var error in errors)
+				foreach (var error in errors)
 				{
 					ModelState.AddModelError(error.Code, error.Description);
 				}

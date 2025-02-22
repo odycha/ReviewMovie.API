@@ -1,14 +1,14 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using ReviewMovie.API.Data;
-using ReviewMovie.API.Models.Movie;
-using ReviewMovie.API.Contracts;
+﻿using Asp.Versioning;
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
-using ReviewMovie.API.Exceptions;
-using Asp.Versioning;
-using ReviewMovie.API.Model;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
+using Microsoft.EntityFrameworkCore;
+using ReviewMovie.API.Core.Contracts;
+using ReviewMovie.API.Core.Exceptions;
+using ReviewMovie.API.Core.Model;
+using ReviewMovie.API.Core.Models.Movie;
+using ReviewMovie.API.Data;
 
 namespace ReviewMovie.API.Controllers
 {
@@ -86,7 +86,7 @@ namespace ReviewMovie.API.Controllers
 			}
 			catch (DbUpdateConcurrencyException)
 			{
-				if (! await CountryExists(id))
+				if (!await CountryExists(id))
 				{
 					return NotFound();
 				}
@@ -118,7 +118,7 @@ namespace ReviewMovie.API.Controllers
 		public async Task<IActionResult> DeleteMovie(int id)
 		{
 			var country = await _moviesRepository.GetAsync(id);
-			if(country == null)
+			if (country == null)
 			{
 				throw new NotFoundException(nameof(DeleteMovie), id);
 			}

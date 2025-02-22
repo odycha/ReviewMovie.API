@@ -1,4 +1,5 @@
 
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -6,6 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using ReviewMovie.API.Configurations;
 using ReviewMovie.API.Contracts;
 using ReviewMovie.API.Data;
+using ReviewMovie.API.Middleware;
 using ReviewMovie.API.Repository;
 using Serilog;
 using System.Text;
@@ -53,6 +55,31 @@ namespace ReviewMovie.API
 					.AllowAnyMethod());
 			});
 
+			//versioning configuration (1/2)
+			var apiVersioningBuilder = builder.Services.AddApiVersioning(options =>
+			{
+				options.ReportApiVersions = true;
+				options.DefaultApiVersion = new ApiVersion(1, 0);
+				options.AssumeDefaultVersionWhenUnspecified = true;
+				// Use whatever reader you want
+				options.ApiVersionReader = ApiVersionReader.Combine(
+					new QueryStringApiVersionReader("api-version"),
+					new HeaderApiVersionReader("X-Version"),
+					new MediaTypeApiVersionReader("ver")
+				);
+			});// Nuget Package: Asp.Versioning.Mvc
+			   //versioning configuration (2/2)
+			apiVersioningBuilder.AddApiExplorer(options =>
+			{
+				// add the versioned api explorer, which also adds IApiVersionDescriptionProvider service
+				// note: the specified format code will format the version as "'v'major[.minor][-status]"
+				options.GroupNameFormat = "'v'VVV";
+
+				// note: this option is only necessary when versioning by url segment. the SubstitutionFormat
+				// can also be used to control the format of the API version in route templates
+				options.SubstituteApiVersionInUrl = true;
+			}); // Nuget Package: Asp.Versioning.Mvc.ApiExplorer
+
 			//Serilog and Seq Configuration
 			builder.Host.UseSerilog((ctx, lc) => lc.WriteTo.Console().ReadFrom.Configuration(ctx.Configuration));
 
@@ -90,6 +117,8 @@ namespace ReviewMovie.API
 
 			app.UseSwagger();
 			app.UseSwaggerUI();
+
+			app.UseMiddleware<ExceptionMiddleware>();
 
 			app.UseSerilogRequestLogging();
 

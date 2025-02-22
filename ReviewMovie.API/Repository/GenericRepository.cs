@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using ReviewMovie.API.Contracts;
 using ReviewMovie.API.Data;
+using ReviewMovie.API.Exceptions;
 
 namespace ReviewMovie.API.Repository
 {
@@ -15,11 +16,12 @@ namespace ReviewMovie.API.Repository
 		}
 		public async Task<T> GetAsync(int? id)
 		{
-			if (id == null)
+			var result = await _context.Set<T>().FindAsync(id);
+			if (result is null)
 			{
-				return null;
+				throw new NotFoundException(typeof(T).Name, id.HasValue ? id : "No Key Provided");
 			}
-			return await _context.Set<T>().FindAsync(id);
+			return result;
 		}
 		public async Task<List<T>> GetAllAsync()
 		{
@@ -38,6 +40,10 @@ namespace ReviewMovie.API.Repository
 		public async Task DeleteAsync(int id)
 		{
 			var entity = await GetAsync(id);
+			if (entity is null)
+			{
+				throw new NotFoundException(typeof(T).Name, id);
+			}
 			_context.Remove(entity);
 			await _context.SaveChangesAsync();
 		}

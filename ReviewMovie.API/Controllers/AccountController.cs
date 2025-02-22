@@ -1,19 +1,23 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Mvc;
 using ReviewMovie.API.Contracts;
 using ReviewMovie.API.Models.User;
 using ReviewMovie.API.Repository;
 
 namespace ReviewMovie.API.Controllers
 {
-	[Route("api/[controller]")]
+	[Route("api/v{version:apiVersion}/[controller]")]
 	[ApiController]
+	[ApiVersion("1.0")]
 	public class AccountController : ControllerBase
 	{
 		private readonly IAuthManager _authManager;
+		private readonly ILogger<AccountController> _logger;
 
-		public AccountController(IAuthManager authManager)
+		public AccountController(IAuthManager authManager, ILogger<AccountController> logger)
 		{
 			_authManager = authManager;
+			_logger = logger;
 		}
 
 

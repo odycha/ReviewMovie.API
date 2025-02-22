@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Asp.Versioning;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -9,14 +10,16 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ReviewMovie.API.Contracts;
 using ReviewMovie.API.Data;
+using ReviewMovie.API.Exceptions;
 using ReviewMovie.API.Models.Review;
 
 namespace ReviewMovie.API.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
+	[Route("api/v{version:apiVersion}/[controller]")]
+	[ApiController]
     [Authorize]
-    public class ReviewsController : ControllerBase
+    [ApiVersion("1.0")]
+	public class ReviewsController : ControllerBase
     {
         private readonly IMapper _mapper;
         private readonly IReviewsRepository _reviewsRepository;
@@ -41,12 +44,7 @@ namespace ReviewMovie.API.Controllers
         public async Task<ActionResult<ReviewDto>> GetReview(int id)
         {
             var review = await _reviewsRepository.GetAsync(id);
-
-            if (review == null)
-            {
-                return NotFound();
-            }
-
+        
             var reviewDto = _mapper.Map<ReviewDto>(review);
 
             return Ok(reviewDto);
@@ -60,14 +58,14 @@ namespace ReviewMovie.API.Controllers
         {
             if (id != reviewDto.Id)
             {
-                return BadRequest();
-            }
+				throw new BadRequestException("Wrong id given");
+			}
 
             var review = await _reviewsRepository.GetAsync(id);
             if(review == null)
             {
-                return NotFound();
-            }
+				throw new NotFoundException(nameof(PutReview), id);
+			}
 
             _mapper.Map(reviewDto, review);
 
@@ -109,8 +107,8 @@ namespace ReviewMovie.API.Controllers
             var review = await _reviewsRepository.GetAsync(id);
             if (review == null)
             {
-                return NotFound();
-            }
+				throw new NotFoundException(nameof(DeleteReview), id);
+			}
 
             await _reviewsRepository.DeleteAsync(id);
 

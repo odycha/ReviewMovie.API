@@ -5,12 +5,15 @@ using ReviewMovie.API.Data;
 using ReviewMovie.API.Models.Movie;
 using ReviewMovie.API.Contracts;
 using Microsoft.AspNetCore.Authorization;
+using ReviewMovie.API.Exceptions;
+using Asp.Versioning;
 
 namespace ReviewMovie.API.Controllers
 {
-	[Route("api/[controller]")]
+	[Route("api/v{version:apiVersion}/[controller]")]
 	[ApiController]
 	[Authorize]
+	[ApiVersion("1.0")]
 	public class MoviesController : ControllerBase
 	{
 		private readonly IMapper _mapper;
@@ -39,11 +42,6 @@ namespace ReviewMovie.API.Controllers
 		{
 			var movie = await _moviesRepository.GetDetails(id);
 
-			if (movie == null)
-			{
-				return NotFound();
-			}
-
 			var moviesDto = _mapper.Map<MovieDto>(movie);
 
 			return Ok(moviesDto);
@@ -57,14 +55,14 @@ namespace ReviewMovie.API.Controllers
 		{
 			if (id != updateMovieDto.Id)
 			{
-				return BadRequest();
+				throw new BadRequestException("Wrong id given");
 			}
 
 			var movie = await _moviesRepository.GetAsync(id); //now movie is being tracked
 
 			if (movie == null)
 			{
-				return NotFound();
+				throw new NotFoundException(nameof(PutMovie), id);
 			}
 
 			_mapper.Map(updateMovieDto, movie);
@@ -109,7 +107,7 @@ namespace ReviewMovie.API.Controllers
 			var country = await _moviesRepository.GetAsync(id);
 			if(country == null)
 			{
-				return NotFound();
+				throw new NotFoundException(nameof(DeleteMovie), id);
 			}
 
 			await _moviesRepository.DeleteAsync(id);

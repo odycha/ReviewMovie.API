@@ -7,6 +7,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OData.Query;
 using Microsoft.EntityFrameworkCore;
 using ReviewMovie.API.Contracts;
 using ReviewMovie.API.Data;
@@ -33,15 +34,17 @@ namespace ReviewMovie.API.Controllers
 
         // GET: api/v1/Reviews/GetAll
         [HttpGet("GetAll")]
-        public async Task<ActionResult<IEnumerable<ReviewDto>>> GetReviews()
+		[EnableQuery]
+		public async Task<ActionResult<IEnumerable<ReviewDto>>> GetReviews()
         {
             var reviews = await _reviewsRepository.GetAllAsync();
             var reviewsDto = _mapper.Map<List<ReviewDto>>(reviews);
             return Ok(reviewsDto);
         }
 
-		//GET: api/v1/Reviews/?StartIndex=0&pagesize=25&PageNumber=1
+		//GET: api/v1/Reviews?StartIndex=0&pagesize=25&PageNumber=1
 		[HttpGet]
+		[EnableQuery]
 		public async Task<ActionResult<PagedResult<ReviewDto>>> GetReviews([FromQuery] QueryParameters queryParameters)
         {
             var pagedReviewResult = await _reviewsRepository.GetAllAsync<ReviewDto>(queryParameters);
@@ -50,7 +53,8 @@ namespace ReviewMovie.API.Controllers
 
 		// GET: api/Reviews/5
 		[HttpGet("{id}")]
-        public async Task<ActionResult<ReviewDto>> GetReview(int id)
+		[EnableQuery]
+		public async Task<ActionResult<ReviewDto>> GetReview(int id)
         {
             var review = await _reviewsRepository.GetAsync(id);
         

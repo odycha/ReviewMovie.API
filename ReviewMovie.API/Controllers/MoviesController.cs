@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using ReviewMovie.API.Exceptions;
 using Asp.Versioning;
 using ReviewMovie.API.Model;
+using Microsoft.AspNetCore.OData.Query;
 
 namespace ReviewMovie.API.Controllers
 {
@@ -28,6 +29,7 @@ namespace ReviewMovie.API.Controllers
 
 		// GET: api/v1/Movies/GetAll
 		[HttpGet("GetAll")]
+		[EnableQuery]
 		public async Task<ActionResult<IEnumerable<GetMovieDto>>> GetMovies()
 		{
 			var movies = await _moviesRepository.GetAllAsync();
@@ -39,6 +41,7 @@ namespace ReviewMovie.API.Controllers
 
 		// GET: api/v1/Movies?StartIndex=0&pagesize=25&PageNumber=1
 		[HttpGet]
+		[EnableQuery]
 		public async Task<ActionResult<PagedResult<GetMovieDto>>> GetPagedMovies([FromQuery] QueryParameters queryParameters)
 		{
 			var pagedMoviesResult = await _moviesRepository.GetAllAsync<GetMovieDto>(queryParameters);
@@ -47,6 +50,7 @@ namespace ReviewMovie.API.Controllers
 
 		// GET: api/Movies/5
 		[HttpGet("{id}")]
+		[EnableQuery]
 		public async Task<ActionResult<MovieDto>> GetMovie(int id)
 		{
 			var movie = await _moviesRepository.GetDetails(id);

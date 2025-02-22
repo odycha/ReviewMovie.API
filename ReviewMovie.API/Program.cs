@@ -3,6 +3,7 @@ using Asp.Versioning;
 using Azure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.OData;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using ReviewMovie.API.Configurations;
@@ -40,7 +41,12 @@ namespace ReviewMovie.API
 				.AddEntityFrameworkStores<MovieReviewDbContext>()
 				.AddDefaultTokenProviders();
 
-			builder.Services.AddControllers();
+			//Configure OData
+			builder.Services.AddControllers().AddOData(options =>
+			{
+				options.Select().Filter().OrderBy();
+			}); ;
+
 			// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 			builder.Services.AddEndpointsApiExplorer();
 			builder.Services.AddSwaggerGen();
